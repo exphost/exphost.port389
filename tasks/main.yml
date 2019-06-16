@@ -1,3 +1,46 @@
 - name: deb
   debug:
     msg: "jeste 389e"
+
+- block:
+  - name: install 389
+    yum:
+      name:
+      - 389-ds-base
+      - 389-admin
+
+  - name: copy installation script
+    template:
+      src: install.inf
+      dest: "/root/port389-install-{{app.key}}.inf"
+
+  - name: insert domain to /etc/hosts
+    lineinfile:
+      path: /etc/hosts
+      line: "127.0.0.2 {{app.value.port389.configs.machineName}}"
+
+  - name: setup ds
+    command: "/usr/sbin/setup-ds-admin.pl -s -f /root/port389-install-{{app.key}}.inf"
+    args:
+      creates: "/etc/dirsrv/slapd-{{app.value.port389.configs.identifier}}"
+
+  - name: start end enable port389
+    service:
+      name: "dirsrv@{{app.value.port389.configs.identifier}}"
+      state: started
+      enabled: True
+
+  - name: start end enable admin
+    service:
+      name: dirsrv-admin
+      state: started
+      enabled: True
+
+  - name: configure ldap
+    include_role:
+      name: exphost.ldap
+    vars:
+      content: "{{app.value.port389.content}}"
+      bindDN: "{{app.value.port389.configs.dmUser}}"
+      bindPW: "{{app.value.port389.configs.dmPassword}}"
+  become: True

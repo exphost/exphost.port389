@@ -1,0 +1,16 @@
+[General]
+FullMachineName={{app.value.port389.configs.machineName}}
+SuiteSpotUserID=dirsrv
+SuiteSpotGroup=dirsrv
+ConfigDirectoryAdminID={{app.value.port389.configs.adminUser}}
+ConfigDirectoryAdminPwd={{app.value.port389.configs.adminPassword}}
+[slapd]
+ServerPort={{app.value.port389.configs.port}}
+UseExistingMC= 0
+ServerIdentifier={{app.value.port389.configs.identifier}}
+Suffix={{app.value.port389.configs.suffix}}
+RootDN=cn={{app.value.port389.configs.dmUser}}
+RootDNPwd={{app.value.port389.configs.dmPassword}}
+[admin]
+Port= 9830
+
