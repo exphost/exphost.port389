@@ -1,0 +1,17 @@
+{
+  "services": [
+  {
+    "name": "port389-{{app.key}}",
+    "tags": ["port389"],
+    "port": {{app.value.port389.endpoints.ldap.port}},
+    "checks": [
+    {
+      "tcp": "localhost:{{app.value.port389.endpoints.ldap.port}}",
+      "interval": "5s",
+      "timeout": "1s"
+    }
+    ]
+  }
+  ]
+}
+

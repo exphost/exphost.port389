@@ -44,3 +44,5 @@
       bindDN: "{{app.value.port389.configs.dmUser}}"
       bindPW: "{{app.value.port389.configs.dmPassword}}"
   become: True
+
+- include_tasks: consul_discovery.yml
