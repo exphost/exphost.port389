@@ -20,3 +20,4 @@ allow_duplicates: True
 dependencies:
   - role: exphost.ldap
     when: False
+    version: v0.0.1
