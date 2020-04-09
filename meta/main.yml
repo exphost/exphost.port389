@@ -17,3 +17,6 @@ galaxy_info:
     - 389
 
 allow_duplicates: True
+dependencies:
+  - role: exphost.ldap
+    when: False
