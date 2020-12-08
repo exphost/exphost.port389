@@ -30,7 +30,7 @@
       state: started
       enabled: True
 
-  - name: start end enable admin
+  - name: start and enable admin
     service:
       name: dirsrv-admin
       state: started
