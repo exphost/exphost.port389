@@ -36,6 +36,10 @@
       state: started
       enabled: True
 
+  - name: wait for ldap to start
+    wait_for:
+      port: "{{app.value.port389.configs.port}}"
+
   - name: configure ldap
     include_role:
       name: exphost.ldap
