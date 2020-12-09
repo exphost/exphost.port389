@@ -11,5 +11,10 @@
       template:
         src: consul_discovery.json
         dest: "/app/shared/consul/conf/port389-{{app.key}}.json"
+    - name: wait for consul to reload config
+      pause:
+        seconds: 2
+
+  when: _consul_dir.stat.isdir|default(False)
   become: True
   become_user: root
