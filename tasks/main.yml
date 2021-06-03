@@ -3,11 +3,26 @@
     msg: "jeste 389e"
 
 - block:
+  - name: enable dnf modules
+    copy:
+      src: "{{ item }}"
+      dest: /etc/dnf/modules.d/
+      mode: 0644
+    with_fileglob:
+      - "files/dnf_modules/*"
+    when: ansible_distribution_major_version == "8"
+
   - name: install 389
     yum:
       name:
       - 389-ds-base
-      - 389-admin
+
+  - name: install 389 legacy tools
+    dnf:
+      name:
+        - 389-ds-base-legacy-tools
+    when: ansible_distribution_major_version == "8"
+
 
   - name: copy installation script
     template:
