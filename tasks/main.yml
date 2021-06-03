@@ -1,67 +1,67 @@
+---
 - name: deb
   debug:
     msg: "jeste 389e"
 
 - block:
-  - name: enable dnf modules
-    copy:
-      src: "{{ item }}"
-      dest: /etc/dnf/modules.d/
-      mode: 0644
-    with_fileglob:
-      - "files/dnf_modules/*"
-    when: ansible_distribution_major_version == "8"
+    - name: enable dnf modules
+      copy:
+        src: "{{ item }}"
+        dest: /etc/dnf/modules.d/
+        mode: 0644
+      with_fileglob:
+        - "files/dnf_modules/*"
+      when: ansible_distribution_major_version == "8"
 
-  - name: install 389
-    yum:
-      name:
-      - 389-ds-base
+    - name: install 389
+      yum:
+        name:
+          - 389-ds-base
 
-  - name: install 389 legacy tools
-    dnf:
-      name:
-        - 389-ds-base-legacy-tools
-    when: ansible_distribution_major_version == "8"
+    - name: install 389 legacy tools
+      dnf:
+        name:
+          - 389-ds-base-legacy-tools
+      when: ansible_distribution_major_version == "8"
 
+    - name: copy installation script
+      template:
+        src: install.inf
+        dest: "/root/port389-install-{{ app.key }}.inf"
+        mode: 0600
 
-  - name: copy installation script
-    template:
-      src: install.inf
-      dest: "/root/port389-install-{{app.key}}.inf"
+    - name: insert domain to /etc/hosts
+      lineinfile:
+        path: /etc/hosts
+        line: "127.0.0.2 {{ app.value.port389.configs.machineName }}"
 
-  - name: insert domain to /etc/hosts
-    lineinfile:
-      path: /etc/hosts
-      line: "127.0.0.2 {{app.value.port389.configs.machineName}}"
+    - name: setup ds
+      command: "/usr/sbin/setup-ds.pl -s -f /root/port389-install-{{ app.key }}.inf"
+      args:
+        creates: "/etc/dirsrv/slapd-{{ app.value.port389.configs.identifier }}"
 
-  - name: setup ds
-    command: "/usr/sbin/setup-ds-admin.pl -s -f /root/port389-install-{{app.key}}.inf"
-    args:
-      creates: "/etc/dirsrv/slapd-{{app.value.port389.configs.identifier}}"
+    - name: start end enable port389 instance
+      service:
+        name: "dirsrv@{{ app.value.port389.configs.identifier }}.service"
+        enabled: true
 
-  - name: start end enable port389
-    service:
-      name: "dirsrv@{{app.value.port389.configs.identifier}}"
-      state: started
-      enabled: True
+    - name: start end enable port389
+      service:
+        name: "dirsrv.target"
+        enabled: true
+        state: started
 
-  - name: start and enable admin
-    service:
-      name: dirsrv-admin
-      state: started
-      enabled: True
+    - name: wait for ldap to start
+      wait_for:
+        port: "{{ app.value.port389.configs.port }}"
 
-  - name: wait for ldap to start
-    wait_for:
-      port: "{{app.value.port389.configs.port}}"
-
-  - name: configure ldap
-    include_role:
-      name: exphost.ldap
-    vars:
-      content: "{{app.value.port389.content}}"
-      bindDN: "{{app.value.port389.configs.dmUser}}"
-      bindPW: "{{app.value.port389.configs.dmPassword}}"
-  become: True
+    - name: configure ldap
+      include_role:
+        name: exphost.ldap
+      vars:
+        content: "{{ app.value.port389.content }}"
+        bindDN: "{{ app.value.port389.configs.dmUser }}"
+        bindPW: "{{ app.value.port389.configs.dmPassword }}"
+  become: true
 
 - include_tasks: consul_discovery.yml

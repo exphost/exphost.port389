@@ -1,0 +1,29 @@
+apps_auth:
+  auth:
+    port389:
+      type: exphost.port389
+      enabled: True
+      endpoints:
+        ldap:
+          address: localhost
+          port: 389
+      configs:
+        machineName: "test-0.localdomain"
+        adminUser: "admin"
+        adminPassword: "adminpass"
+        port: 389
+        identifier: ldap
+        suffix: "dc=test-0,dc=localdomain"
+        dmUser: "cm=Directory Manager"
+        dmPassword: "dmpass"
+      content:
+        - dn: "uid=testuser,ou=People,dc=test-0,dc=localdomain"
+          objectClass:
+            - organizationalPerson
+            - person
+            - mailrecipient
+          attributes:
+            cn: "testusercn"
+            sn: "testusersn"
+            mail: "testuser@localdomain"
+            userPassword: "testuserpass"

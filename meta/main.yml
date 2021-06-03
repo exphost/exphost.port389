@@ -10,14 +10,15 @@ galaxy_info:
     - name: el
       versions:
         - 7
+        - 8
   galaxy_tags:
     - fabsible
     - ldap
     - port389
-    - 389
+    - 389ds
 
-allow_duplicates: True
+allow_duplicates: true
 dependencies:
   - role: exphost.ldap
-    when: False
+    when: false
     version: v0.0.1
